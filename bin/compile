@@ -159,7 +159,7 @@ if [ "$GIT_SSH_KEY" != "" ]; then
   echo $GIT_SSH_KEY | base64 --decode > id_rsa
   # launch ssh-agent, we'll use it to serve our ssh key
   # and kill it towards the end of the buildpack's run
-  eval `ssh-agent -s`
+in  eval `ssh-agent -s`
   # ssh-add doesn't like the default 644
   chmod 600 id_rsa
   # We're not supporting passphrases at this time.  We could pull that in
@@ -174,10 +174,11 @@ fi
 status "Pruning cached dependencies not specified in package.json"
 npm prune 2>&1 | indent
 
+status "Installing yarn which is required by other dependencies"
+npm install yarn 2>&1 | indent
 
 status "Installing dependencies"
-# Make npm output to STDOUT instead of its default STDERR
-npm install --quiet --no-optional --userconfig $build_dir/.npmrc 2>&1 | indent
+yarn install --pure-lockfile --no-emoji 2>&1 | indent
 
 PATH=$build_dir/node_modules/.bin:$PATH
 
@@ -188,7 +189,7 @@ else
   npm install bower --save-dev --quiet --no-optional --userconfig $build_dir/.npmrc 2>&1 | indent
 fi
 
-PATH=$build_dir/node_modules/bower/bin:$PATH
+PATH=$build_dir/node_modules/bower/bin:node_modules/yarn/bin:$PATH
 
 status "Pruning cached bower dependencies not specified in bower.json"
 bower prune 2>&1 | indent
