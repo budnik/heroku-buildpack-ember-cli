@@ -117,28 +117,6 @@ if [ "$REBUILD_ALL" == "true" ] || [ "$REBUILD_BOWER_PACKAGES" == "true" ]; then
   rm -rf $build_dir/bower_components $cache_dir/bower_components
 fi
 
-# If node_modules directory is checked into source control then
-# rebuild any native deps. Otherwise, restore from the build cache.
-if test -d $build_dir/node_modules; then
-  status "Found existing node_modules directory; skipping cache"
-  status "Rebuilding any native dependencies"
-  npm rebuild 2>&1 | indent
-else
-  if test -d $cache_dir/node_modules; then
-    status "Restoring node_modules directory from cache"
-  else
-    status "Creating node_modules cache directory"
-    mkdir -p $cache_dir/node_modules
-  fi
-
-  ln -s $cache_dir/node_modules $build_dir/node_modules
-
-  if test -f $cache_dir/.heroku/node-version && [ $(cat $cache_dir/.heroku/node-version) != "$node_version" ]; then
-    status "Node version changed since last build; rebuilding dependencies"
-    npm rebuild 2>&1 | indent
-  fi
-fi
-
 # Restore bower_components from cache if it exists
 if test -d $build_dir/bower_components; then
   status "Found existing bower_components directory; skipping cache"
