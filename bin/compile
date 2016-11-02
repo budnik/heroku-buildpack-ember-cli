@@ -153,7 +153,7 @@ status "Pruning cached dependencies not specified in package.json"
 npm prune 2>&1 | indent
 
 status "Installing yarn which is required by other dependencies"
-npm install yarn 2>&1 | indent
+npm install yarn -g 2>&1 | indent
 PATH=$build_dir/node_modules/.bin:$PATH
 
 status "Installing dependencies"
